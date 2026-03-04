@@ -1,0 +1,109 @@
+<!-- pages/diary/diary.wxml -->
+<view class="container">
+
+  <!-- Empty State -->
+  <view class="empty-state" wx:if="{{records.length === 0}}">
+    <text class="empty-icon">( ˘ω˘ )</text>
+    <text class="empty-title">还没有洗头记录</text>
+    <text class="empty-desc">去日历页面记录你的第一次洗头吧</text>
+    <view class="btn-go" bindtap="goToCalendar">
+      <text class="btn-go-text">去日历记录</text>
+    </view>
+  </view>
+
+  <!-- Record List -->
+  <view wx:else>
+    <view class="list-header">
+      <text class="list-title">洗头日记</text>
+      <text class="list-count">共 {{records.length}} 次</text>
+    </view>
+
+    <view class="record-list">
+      <view class="record-row" wx:for="{{records}}" wx:key="id">
+
+        <!-- Timeline Line -->
+        <view class="timeline">
+          <view class="tl-dot {{item.intervalWarn ? 'tl-dot-warn' : ''}}"></view>
+          <view class="tl-line" wx:if="{{!item.isLast}}"></view>
+        </view>
+
+        <!-- Card -->
+        <view class="record-card">
+          <view class="card-top">
+            <view class="date-group">
+              <text class="record-date">{{item.date}}</text>
+              <text class="record-weekday">{{item.weekday}}</text>
+            </view>
+            <view class="card-actions">
+              <text
+                class="action-btn action-edit"
+                bindtap="onOpenEdit"
+                data-id="{{item.id}}"
+                data-date="{{item.date}}"
+                data-note="{{item.note}}"
+              >编辑</text>
+              <text
+                class="action-btn action-delete"
+                bindtap="onDeleteRecord"
+                data-id="{{item.id}}"
+                data-date="{{item.date}}"
+              >删除</text>
+            </view>
+          </view>
+
+          <text
+            class="record-note"
+            wx:if="{{item.note}}"
+          >{{item.note}}</text>
+          <text
+            class="record-note note-placeholder"
+            wx:else
+            bindtap="onOpenEdit"
+            data-id="{{item.id}}"
+            data-date="{{item.date}}"
+            data-note=""
+          >点击添加备注...</text>
+
+          <view class="interval-tag {{item.intervalWarn ? 'tag-warn' : 'tag-normal'}}" wx:if="{{item.daysBetween !== null}}">
+            <text class="interval-text">距上次 {{item.daysBetween}} 天</text>
+          </view>
+        </view>
+
+      </view>
+    </view>
+  </view>
+
+  <!-- Edit Note Modal -->
+  <view class="overlay" wx:if="{{showEditModal}}" bindtap="onCloseModal">
+    <view class="modal" catchtap="noop">
+      <view class="modal-header">
+        <view>
+          <text class="modal-title">编辑备注</text>
+          <text class="modal-sub">{{editingDate}}</text>
+        </view>
+        <view class="modal-close" bindtap="onCloseModal">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+      <view class="modal-body">
+        <textarea
+          class="note-textarea"
+          placeholder="记录一下当时的感受或心情..."
+          value="{{editNote}}"
+          bindinput="onNoteInput"
+          maxlength="200"
+          auto-height
+        />
+        <view class="modal-btns">
+          <view class="btn-cancel" bindtap="onCloseModal">
+            <text>取消</text>
+          </view>
+          <view class="btn-save" bindtap="onSaveNote">
+            <text>保存</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</view>

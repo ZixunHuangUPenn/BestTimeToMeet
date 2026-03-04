@@ -1,0 +1,113 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+
+  <!-- Stats Bar -->
+  <view class="stats-bar">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.total || 0}}</text>
+      <text class="stat-label">总次数</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.daysSinceLast !== null ? stats.daysSinceLast : '-'}}</text>
+      <text class="stat-label">距上次(天)</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.avgInterval || '-'}}</text>
+      <text class="stat-label">平均间隔(天)</text>
+    </view>
+  </view>
+
+  <!-- Calendar Card -->
+  <view class="calendar-card">
+
+    <!-- Month Navigation -->
+    <view class="month-nav">
+      <view class="nav-btn" bindtap="prevMonth">
+        <text class="nav-arrow">‹</text>
+      </view>
+      <view bindtap="goToToday">
+        <text class="month-label">{{monthLabel}}</text>
+      </view>
+      <view class="nav-btn" bindtap="nextMonth">
+        <text class="nav-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- Weekday Headers -->
+    <view class="weekday-row">
+      <view
+        class="weekday-cell {{index === 0 || index === 6 ? 'weekend' : ''}}"
+        wx:for="{{weekdays}}"
+        wx:key="index"
+      >{{item}}</view>
+    </view>
+
+    <!-- Days Grid -->
+    <view class="days-grid">
+      <block wx:for="{{days}}" wx:key="index">
+        <!-- Empty cell -->
+        <view class="day-cell" wx:if="{{item.empty}}"></view>
+        <!-- Day cell -->
+        <view
+          wx:else
+          class="day-cell"
+          bindtap="onDayTap"
+          data-date="{{item.date}}"
+        >
+          <view class="day-inner {{item.isToday ? 'is-today' : ''}}">
+            <text class="day-num {{item.numClass}}">{{item.day}}</text>
+          </view>
+          <view class="{{item.dotClass}}" wx:if="{{item.hasRecord}}"></view>
+          <view class="dot dot-invis" wx:else></view>
+        </view>
+      </block>
+    </view>
+
+  </view>
+
+  <!-- Log Today FAB -->
+  <view class="fab" bindtap="onLogToday">
+    <text class="fab-text">今天洗头了</text>
+  </view>
+
+  <!-- Modal -->
+  <view class="overlay" wx:if="{{showModal}}" bindtap="onCloseModal">
+    <view class="modal" catchtap="noop">
+
+      <view class="modal-header">
+        <text class="modal-title">{{modalDate}}</text>
+        <view class="modal-close" bindtap="onCloseModal">
+          <text class="close-icon">✕</text>
+        </view>
+      </view>
+
+      <!-- Already recorded -->
+      <view class="modal-body" wx:if="{{modalHasRecord}}">
+        <view class="recorded-badge">
+          <text class="recorded-text">已记录洗头</text>
+        </view>
+        <text class="modal-note" wx:if="{{modalRecordNote}}">{{modalRecordNote}}</text>
+        <text class="modal-note note-empty" wx:else>（无备注）</text>
+        <button class="btn-delete" bindtap="onDeleteRecord">删除记录</button>
+      </view>
+
+      <!-- Not yet recorded -->
+      <view class="modal-body" wx:else>
+        <text class="modal-hint">记录这天的洗头</text>
+        <input
+          class="note-input"
+          placeholder="添加备注（可选）"
+          value="{{noteInput}}"
+          bindinput="onNoteInput"
+          maxlength="100"
+          confirm-type="done"
+        />
+        <button class="btn-add" bindtap="onAddRecord">记录洗头</button>
+      </view>
+
+    </view>
+  </view>
+
+</view>
